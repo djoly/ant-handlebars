@@ -1,0 +1,10 @@
+apply plugin: 'java'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile 'org.mozilla:rhino:1.7R4', 'org.apache.ant:ant:1.9.3','commons-lang:commons-lang:2.3'
+	testCompile 'junit:junit:4.11'
+}

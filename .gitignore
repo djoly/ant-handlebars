@@ -1,0 +1,5 @@
+.idea
+.gradle
+ant-handlebars.iml
+/out
+/build
