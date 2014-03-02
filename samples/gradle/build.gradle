@@ -1,0 +1,28 @@
+apply plugin: 'war'
+apply plugin: 'jetty'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+configurations {
+    handlebars
+}
+
+task handlebars << {
+    ant.taskdef(name: 'handlebars', classname: 'com.djoly.build.ant.task.handlebars.CompileHandlebarsTask', classpath: configurations.handlebars.asPath)
+    ant.handlebars(templateDir:'src/main/webapp/templates',compileFile:'src/main/webapp/compiled-templates.js')
+    ant.handlebars(templateDir:'src/main/webapp/partials',compileFile:'src/main/webapp/compiled-partials.js', partials:true)
+}
+
+dependencies {
+    handlebars 'com.djoly.build:ant-handlebars:0.0.1'
+}
+
+war.dependsOn handlebars
+jettyRun.dependsOn handlebars
+
+httpPort = 8090
+stopPort = 9451
+stopKey = 'foo'

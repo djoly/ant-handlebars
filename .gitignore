@@ -3,3 +3,6 @@
 ant-handlebars.iml
 /out
 /build
+gradle-app.setting
+/samples/gradle/build
+compiled-*.js

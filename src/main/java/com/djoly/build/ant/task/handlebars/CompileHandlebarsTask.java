@@ -98,7 +98,7 @@ public class CompileHandlebarsTask extends Task {
         BufferedWriter bw = null;
 
         try {
-            Compiler compiler = new Compiler(getHandlebarsFile(),options);
+            Compiler compiler = new Compiler(loadHandleBarsScript(),options);
 
             fw = new FileWriter(file);
             bw = new BufferedWriter(fw);
@@ -120,7 +120,7 @@ public class CompileHandlebarsTask extends Task {
             bw.newLine();
 
             while(filesIterator.hasNext()) {
-                Resource fr = filesIterator.next();
+                Resource fr = filesIterator.nextResource();
 
                 InputStreamReader r = new InputStreamReader(fr.getInputStream());
                 String templateContent = FileUtils.readFully(r);
@@ -215,8 +215,7 @@ public class CompileHandlebarsTask extends Task {
     }
 
     public String getHandlebarsFile() {
-        return handlebarsFile != null ? handlebarsFile :
-                this.getClass().getResource("/handlebars-v1.3.0.js").getPath();
+        return handlebarsFile;
     }
 
     public void setHandlebarsFile(String handlebarsFile) {
@@ -229,5 +228,19 @@ public class CompileHandlebarsTask extends Task {
 
     public void setTemplateDir(String templateDir) {
         this.templateDir = templateDir;
+    }
+
+    private InputStream loadHandleBarsScript() {
+        InputStream scriptStream = null;
+        if(handlebarsFile == null) {
+            scriptStream = this.getClass().getResourceAsStream("/handlebars-v1.3.0.js");
+        } else {
+            try {
+                scriptStream = new FileInputStream(handlebarsFile);
+            } catch(FileNotFoundException e) {
+                throw new BuildException("Could not load handlebars script file " + handlebarsFile);
+            }
+        }
+        return scriptStream;
     }
 }

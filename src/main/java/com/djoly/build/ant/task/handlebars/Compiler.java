@@ -6,9 +6,9 @@ import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 
-import java.io.File;
-import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class Compiler {
 
@@ -17,11 +17,11 @@ public class Compiler {
     private Function precompileFunction;
     private CompileOptions options;
 
-    public Compiler(String scriptFile,CompileOptions options) throws IOException {
+    public Compiler(InputStream script,CompileOptions options) throws IOException {
         this.options = options;
         cx = Context.enter();
         scope = cx.initStandardObjects();
-        FileReader reader = new FileReader(new File(scriptFile));
+        InputStreamReader reader = new InputStreamReader(script);
 
         cx.evaluateString(scope, FileUtils.readFully(reader),"handlebars.js",1,null);
         NativeObject handlebarsObj = (NativeObject)scope.get("Handlebars", scope);

@@ -1,10 +1,31 @@
 apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+group = 'com.djoly.build'
+version = '0.0.1'
 
 repositories {
 	mavenCentral()
 }
 
 dependencies {
-	compile 'org.mozilla:rhino:1.7R4', 'org.apache.ant:ant:1.9.3','commons-lang:commons-lang:2.3'
+	compile 'org.mozilla:rhino:1.7R4', 'org.apache.ant:ant:1.8.4','commons-lang:commons-lang:2.3'
 	testCompile 'junit:junit:4.11'
 }
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+        }
+    }
+}
+
