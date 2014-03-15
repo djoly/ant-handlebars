@@ -1,4 +1,4 @@
-#ant-handlebars, version 0.0.1
+#ant-handlebars
 
 Custom Ant task to precompile handlebar.js templates
 
