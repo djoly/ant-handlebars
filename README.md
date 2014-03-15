@@ -18,35 +18,52 @@ gradle build
 
 ##Options
 
-###templateDir (required)
+####templateDir (required)
 This is your root template directory.
 
-###compileFile (required)
-This the target compile file. Your compiled templates will be dumped to this file.
+####compileFile (required)
+This is the target compile file. Your compiled templates will be dumped to this file.
 
-###partialPattern (optional)
+####partialPattern (optional)
 Any templates matching the specified pattern will be compiled to the Handlebars.partials namespace. All others will be compiled to the Handlebars.templates namespace.
 
-###partials (optional)
+NOTE: Currently, you cannot compile templates and partials to the same file when using AMD. A future version may add this feature.
+
+####partials (optional)
 Specifies if the compiled templates should be compiled as partials. If this flag is set, all templates will be dumped to the Handlebars.partials namespace. If this option is set, partialsPattern is ignored.
 
-###includePattern (optional)
+####includePattern (optional)
 Only templates matching the specified pattern will be compiled. Default pattern is
+
 ```
 **/*.handlebars
 ```
 
-###excludePattern (optional)
+####amd (optional)
+Templates are compiled as an AMD module.
+
+####handlebarsPath (optional)
+When using AMD, specifies the path to the handlebars runtime.
+
+####namespace (optional)
+Override the default Handlebars.templates namespace.
+
+NOTE: The handlebars compiler for nodejs has this option, so I included it. I don't know if this works or not.
+
+####excludePattern (optional)
 Exclude matching templates from being compiled.
 
-###handlebarsFile (optional)
-Handlebars version 1.3.0 is included with this task. If you need to use a different version specify the file here.
+####handlebarsFile (optional)
+Handlebars version 1.3.0 is included with this distribution. If you need to use a different version specify the file here.
 
 NOTE: This feature is currently untested.
 
 ##Running the samples
 
-###Gradle example
+###Gradle sample
+
+The gradle sample demonstrates both simple and AMD usage.
+
 ```
 #clone project
 git clone https://github.com/djoly/ant-handlebars.git
@@ -65,9 +82,10 @@ gradle jettyRun
 
 ```
 
-Open the [web app](http://localhost:8090/gradle) in your browser.
+Open the [simple web app](http://localhost:8090/gradle) in your browser.
+Open the [AMD web app](http://localhost:8090/gradle/amd) in your browser.
 
 ##TO-DO
 
-Add AMD support, compile options, and more samples.
+Add compile options.
 

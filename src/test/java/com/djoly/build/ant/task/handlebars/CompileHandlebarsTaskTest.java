@@ -9,6 +9,8 @@ import org.junit.Before;
 import java.io.File;
 import java.io.FileReader;
 
+import org.apache.tools.ant.BuildException;
+
 public class CompileHandlebarsTaskTest {
 
     private CompileHandlebarsTask task;
@@ -156,5 +158,71 @@ public class CompileHandlebarsTaskTest {
         } catch (Exception e) {
             Assert.fail("Unexpected exception");
         }
+    }
+
+    @Test
+    public void amd_templatesVarReturned() {
+        try {
+            task.setAmd(true);
+            task.execute();
+            Assert.assertTrue(compileFile.exists());
+            String fileContent = FileUtils.readFully(new FileReader(compileFile));
+
+            Assert.assertTrue(fileContent.endsWith("return templates;});"));
+        } catch (Exception e) {
+            Assert.fail("Unexpected exception");
+        }
+    }
+
+    @Test
+    public void amd_HandlebarsPartialsVarIsReturnedWhenInPartialsMode() {
+        try {
+            task.setAmd(true);
+            task.setPartials(true);
+            task.execute();
+            Assert.assertTrue(compileFile.exists());
+            String fileContent = FileUtils.readFully(new FileReader(compileFile));
+
+            Assert.assertTrue(fileContent.endsWith("return Handlebars.partials;});"));
+        } catch (Exception e) {
+            Assert.fail("Unexpected exception");
+        }
+    }
+
+    @Test
+    public void amd_handlebarsPathDefaultsToEmpty() {
+        try {
+            task.setAmd(true);
+            task.execute();
+            Assert.assertTrue(compileFile.exists());
+            String fileContent = FileUtils.readFully(new FileReader(compileFile));
+
+            Assert.assertTrue(fileContent.startsWith("define(['handlebars.runtime'], function(Handlebars)"));
+        } catch (Exception e) {
+            Assert.fail("Unexpected exception");
+        }
+    }
+
+    @Test
+    public void amd_handlebarsPathModifiable() {
+        try {
+            task.setAmd(true);
+            task.setHandlebarsPath("lib/");
+            task.execute();
+            Assert.assertTrue(compileFile.exists());
+            String fileContent = FileUtils.readFully(new FileReader(compileFile));
+
+            Assert.assertTrue(fileContent.startsWith("define(['lib/handlebars.runtime'], function(Handlebars)"));
+        } catch (Exception e) {
+            Assert.fail("Unexpected exception");
+        }
+    }
+
+    @Test(expected=BuildException.class)
+    public void amd_cannotCompileTemplatesAndPartialsTogether() {
+        task.setAmd(true);
+        task.setPartialPattern("partials/*");
+        task.execute();
+
     }
 }

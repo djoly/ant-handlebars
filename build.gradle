@@ -1,8 +1,8 @@
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 
-group = 'com.djoly.build'
-version = '0.0.1'
+group = 'com.djoly'
+version = '0.1.0'
 
 repositories {
 	mavenCentral()

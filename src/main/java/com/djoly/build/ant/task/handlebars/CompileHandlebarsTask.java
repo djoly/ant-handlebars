@@ -24,12 +24,12 @@ public class CompileHandlebarsTask extends Task {
      * Pattern with which to match templates in the base templateDir or its
      * subdirectories. Defaults to ** /*.handlebars
      */
-    private String includePattern;
+    private String includePattern = "**/*.handlebars";
 
     /**
      * Pattern of templates that should be ignored.
      */
-    private String excludePattern;
+    private String excludePattern = StringUtils.EMPTY;
 
     /**
      * Whether or not the matching templates should be compiled as partials.
@@ -54,14 +54,30 @@ public class CompileHandlebarsTask extends Task {
      */
     private String templateDir;
 
-    private static final String COMPILE_FILE_START =
-            "(function() {" +
-            "var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};";
+    /**
+     * Specifies the templates be compiled as an AMD module.
+     */
+    private boolean amd;
 
+    /**
+     * Path to handlebars. Relevant for AMD only.
+     */
+    private String handlebarsPath = StringUtils.EMPTY;
+
+    /**
+     * Template namespace.
+     */
+    private String namespace = "Handlebars.templates";
+
+    private static final String COMPILE_FILE_VAR_LINE = "var template = Handlebars.template, templates = %s = %s || {};";
+    private static final String COMPILE_FILE_START = "(function() {\n";
     private static final String COMPILE_FILE_END = "})();";
+    private static final String AMD_COMPILE_FILE_START =
+            "define(['%shandlebars.runtime'], function(Handlebars) {\nHandlebars = Handlebars['default'];\n";
+    private static final String AMD_COMPILE_FILE_END_PARTIALS = "return Handlebars.partials;});";
+    private static final String AMD_COMPILE_FILE_END_TEMPLATES = "return templates;});";
     private static final String TEMPLATE_ASSIGNMENT = "templates['%s'] = template(%s);";
     private static final String PARTIAL_ASSIGNMENT = "Handlebars.partials['%s'] = template(%s);";
-
 
     public void execute() throws BuildException {
 
@@ -92,6 +108,10 @@ public class CompileHandlebarsTask extends Task {
             log("Will replace existing compiled file " + file.getAbsolutePath());
         }
 
+        if(amd && !partials && partialPattern != null) {
+            throw new BuildException("Cannot compile templates and partials to same file when in AMD mode.");
+        }
+
         CompileOptions options = new CompileOptions();
 
         FileWriter fw = null;
@@ -116,7 +136,8 @@ public class CompileHandlebarsTask extends Task {
             FileResourceIterator filesIterator = new FileResourceIterator(baseDir);
             filesIterator.addFiles(templates);
 
-            bw.write(COMPILE_FILE_START);
+            bw.write(isAmd() ? String.format(AMD_COMPILE_FILE_START,handlebarsPath) : COMPILE_FILE_START);
+            bw.write(String.format(COMPILE_FILE_VAR_LINE,namespace,namespace));
             bw.newLine();
 
             while(filesIterator.hasNext()) {
@@ -137,7 +158,7 @@ public class CompileHandlebarsTask extends Task {
                 bw.newLine();
             }
 
-            bw.write(COMPILE_FILE_END);
+            bw.write(isAmd() ? (isPartials() ? AMD_COMPILE_FILE_END_PARTIALS : AMD_COMPILE_FILE_END_TEMPLATES) : COMPILE_FILE_END);
             bw.flush();
             compiler.done();
 
@@ -175,7 +196,7 @@ public class CompileHandlebarsTask extends Task {
     }
 
     public String getIncludePattern() {
-        return includePattern != null ? includePattern : "**/*.handlebars";
+        return includePattern;
     }
 
     public void setIncludePattern(String includePattern) {
@@ -183,7 +204,7 @@ public class CompileHandlebarsTask extends Task {
     }
 
     public String getExcludePattern() {
-        return excludePattern != null ? excludePattern : StringUtils.EMPTY;
+        return excludePattern;
     }
 
     public void setExcludePattern(String excludePattern) {
@@ -228,6 +249,22 @@ public class CompileHandlebarsTask extends Task {
 
     public void setTemplateDir(String templateDir) {
         this.templateDir = templateDir;
+    }
+
+    public boolean isAmd() {
+        return amd;
+    }
+
+    public void setAmd(boolean amd) {
+        this.amd = amd;
+    }
+
+    public void setHandlebarsPath(String handlebarsPath) {
+        this.handlebarsPath = handlebarsPath;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
     }
 
     private InputStream loadHandleBarsScript() {

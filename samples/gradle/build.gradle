@@ -14,10 +14,14 @@ task handlebars << {
     ant.taskdef(name: 'handlebars', classname: 'com.djoly.build.ant.task.handlebars.CompileHandlebarsTask', classpath: configurations.handlebars.asPath)
     ant.handlebars(templateDir:'src/main/webapp/templates',compileFile:'src/main/webapp/compiled-templates.js')
     ant.handlebars(templateDir:'src/main/webapp/partials',compileFile:'src/main/webapp/compiled-partials.js', partials:true)
+
+    //AMD demonstration...
+    ant.handlebars(templateDir:'src/main/webapp/templates',compileFile:'src/main/webapp/amd/compiled-templates.js',amd:true)
+    ant.handlebars(templateDir:'src/main/webapp/partials',compileFile:'src/main/webapp/amd/compiled-partials.js', partials:true,amd:true)
 }
 
 dependencies {
-    handlebars 'com.djoly.build:ant-handlebars:0.0.1'
+    handlebars 'com.djoly:ant-handlebars:0.1.0'
 }
 
 war.dependsOn handlebars
